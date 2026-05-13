@@ -12,19 +12,34 @@ $OneDriveRoot = "C:\Users\Claude\OneDrive - kilmurrylodge.com\kilmurry shared AI
 
 function Step($msg) { Write-Host "`n>>> $msg" -ForegroundColor Cyan }
 
-Step "1. Checking Python 3.11+"
-$pyOk = $false
-try {
-    $v = & py -3.11 --version 2>$null
-    if ($LASTEXITCODE -eq 0) { $pyOk = $true; Write-Host "  Found: $v" }
-} catch {}
-if (-not $pyOk) {
-    Write-Host "  Python 3.11+ NOT found. Install from python.org first, then re-run." -ForegroundColor Yellow
-    Write-Host "  https://www.python.org/downloads/windows/"
-    Read-Host "  Press ENTER once Python is installed (or Ctrl+C to abort)"
-    $v = & py -3.11 --version
-    if ($LASTEXITCODE -ne 0) { throw "Python 3.11 still not found, aborting." }
+Step "1. Finding Python 3.11+"
+$PyExe = $null
+$candidates = @(
+    "C:\Program Files\Python311\python.exe",
+    "C:\Program Files (x86)\Python311\python.exe",
+    "$env:LOCALAPPDATA\Programs\Python\Python311\python.exe"
+)
+foreach ($c in $candidates) {
+    if (Test-Path $c) { $PyExe = $c; break }
 }
+if (-not $PyExe) {
+    try {
+        $cmd = Get-Command python -ErrorAction Stop
+        $ver = & $cmd.Source --version 2>&1
+        if ($ver -match "Python 3\.(11|12|13)") { $PyExe = $cmd.Source }
+    } catch {}
+}
+if (-not $PyExe) {
+    try {
+        $cmd = Get-Command py -ErrorAction Stop
+        $PyExe = $cmd.Source
+    } catch {}
+}
+if (-not $PyExe) {
+    throw "Python 3.11+ not found. Install from python.org and re-run."
+}
+$verOut = & $PyExe --version
+Write-Host "  Found: $verOut at $PyExe"
 
 Step "2. Checking git"
 $gitOk = $false
@@ -50,7 +65,7 @@ if (Test-Path "$InstallDir\.git") {
 Step "4. Create Python venv"
 Push-Location $InstallDir
 if (-not (Test-Path ".\.venv\Scripts\python.exe")) {
-    py -3.11 -m venv .venv
+    & $PyExe -m venv .venv
 }
 & .\.venv\Scripts\python.exe -m pip install --upgrade pip wheel setuptools | Out-Null
 & .\.venv\Scripts\python.exe -m pip install -e . 2>&1 | Select-Object -Last 6
