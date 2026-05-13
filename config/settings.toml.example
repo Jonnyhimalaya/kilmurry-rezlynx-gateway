@@ -1,0 +1,38 @@
+# Kilmurry Gateway — settings.toml (NON-SECRET)
+# Copy this file to settings.toml and edit. Safe to commit.
+
+[gateway]
+site_label = "Kilmurry Lodge"
+site_id = "KILMURRY"
+poll_interval_hours = 6
+timezone = "UTC"
+# Leave true while RezLynx API access is being arranged.
+# Set to false once a real adapter is wired and credentials are in secrets.toml.
+mock_mode = true
+log_dir = "./logs"
+log_level = "INFO"
+
+[rezlynx]
+# Set base_url once Guestline confirms your API endpoint.
+# Suspected pattern: https://api.guestline.io/{property}/  (NEEDS CONFIRMATION)
+base_url = ""
+site_id = "KILMURRY"
+# One of: "oauth2", "basic", "apikey", "mock"
+auth_mode = "mock"
+client_id = ""
+username = ""
+api_key_header = "X-API-Key"
+timeout_seconds = 30
+verify_ssl = true
+
+[publish]
+# IMPORTANT: this is the local path that OneDrive syncs to the cloud.
+# On Jack's Cowork PC this will look something like:
+#   "C:/Users/jack/Kilmurry Lodge/OneDrive - Kilmurry/Kilmurry Shared AI/Right Revenue Gateway"
+# On Linux/dev:
+#   "./output"
+onedrive_root = "./output"
+feeds_dir = "feeds"
+summaries_dir = "summaries"
+manifests_dir = "manifests"
+write_latest_pointer = true

@@ -1,0 +1,27 @@
+{
+  "schema": "kilmurry.rezlynx.manifest.v1",
+  "generated_at_utc": "2026-05-11T17:50:52.885766Z",
+  "run_id": "gw-a5dd26447c70",
+  "hostname": "localhost",
+  "target_date": "2026-05-11",
+  "feed_file": "rezlynx-revenue-feed-2026-05-11-2026-05-11T175052Z.json",
+  "summary_file": "rezlynx-summary-2026-05-11-2026-05-11T175052Z.html",
+  "feed_bytes": 2883,
+  "elapsed_seconds": 0.016,
+  "validation_warnings": [],
+  "freshness": {
+    "status": "LIVE",
+    "age_minutes": 0.0,
+    "poll_interval_hours": 6
+  },
+  "confidence": "high",
+  "kpi": {
+    "occupancy_pct": 71.43,
+    "adr_eur": 169.37,
+    "revpar_eur": 120.98,
+    "room_revenue_eur": 5928.0,
+    "rooms_sold": 35,
+    "rooms_available": 49,
+    "rooms_out_of_order": 1
+  }
+}

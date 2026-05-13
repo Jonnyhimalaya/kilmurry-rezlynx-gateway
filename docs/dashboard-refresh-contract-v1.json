@@ -1,0 +1,66 @@
+{
+  "schema": "kilmurry.dashboard_refresh_contract.v1",
+  "updated_at_utc": "2026-05-12T16:10:00Z",
+  "source_states": ["LIVE", "STALE", "DERIVED", "MANUAL", "DEMO", "PENDING", "BLOCKED"],
+  "dashboards": {
+    "faye": {
+      "schema": "kilmurry.dashboard.faye.v1",
+      "path": "/home/fayeuser/kilmurry-faye-mission-control",
+      "internal_port": 3338,
+      "public_port": 3339,
+      "role": "revenue control cockpit",
+      "must_label": ["revenue_confidence", "panel_source_state", "provenance"],
+      "primary_sources": ["kilmurry.rezlynx.revenue_feed.v1", "hot-dates-2026.json", "weekly-rate-intel-latest.json", "faye-12-may-manual-pack"],
+      "pending_sources": ["Report Data REST booked-revenue", "Report Data REST dashboard-sales"]
+    },
+    "kate": {
+      "schema": "kilmurry.dashboard.kate.v1",
+      "path": "/home/kateuser/kilmurry-marketing-mc",
+      "internal_port": 3336,
+      "public_port": 3337,
+      "role": "marketing and content cockpit",
+      "must_label": ["campaign_signal_source_state", "demo_marketing_modules", "provenance"],
+      "primary_sources": ["hot-dates-2026.json", "faye derived demand gaps", "weekly-rate-intel-latest.json"],
+      "pending_sources": ["Meta", "Google Business Profile/reputation", "SEO rank data"]
+    },
+    "ciara": {
+      "schema": "kilmurry.dashboard.ciara.v1",
+      "path": "/home/ciarauser/kilmurry-ciara-mission-control",
+      "internal_port": 3340,
+      "public_port": 3341,
+      "role": "sales and account cockpit",
+      "must_label": ["pipeline_source_state", "handoff_source_state", "provenance"],
+      "primary_sources": ["hot-dates-2026.json", "faye derived demand gaps", "manual account lists"],
+      "pending_sources": ["CRM/pipeline sync", "live proposal/account source"]
+    },
+    "owner_ops": {
+      "schema": "kilmurry.dashboard.owner_ops.v1",
+      "path": "/home/clawuser/mission-control",
+      "internal_port": 3333,
+      "public_port": 3333,
+      "role": "owner/ops/data-health cockpit",
+      "must_label": ["service_status", "feed_status", "blocked_sources"],
+      "primary_sources": ["OpenClaw status", "service status", "dashboard refresh manifests"],
+      "pending_sources": []
+    }
+  },
+  "canonical_outputs": [
+    "/home/clawuser/shared/dashboard-refresh/dashboard-refresh-latest.json",
+    "/home/clawuser/shared/dashboard-refresh/faye-dashboard-latest.json",
+    "/home/clawuser/shared/dashboard-refresh/kate-dashboard-latest.json",
+    "/home/clawuser/shared/dashboard-refresh/ciara-dashboard-latest.json",
+    "/home/clawuser/shared/dashboard-refresh/owner-ops-dashboard-latest.json"
+  ],
+  "smoke_checks": [
+    "curl -fsS http://127.0.0.1:3338/api/status",
+    "curl -fsS http://127.0.0.1:3336/api/status",
+    "curl -fsS http://127.0.0.1:3340/api/status",
+    "curl -fsS http://127.0.0.1:3333/api/status"
+  ],
+  "hard_rules": [
+    "Never present demo/manual data as live.",
+    "Do not overwrite previous-good live panels with empty/failed fetches; mark STALE or BLOCKED.",
+    "Do not publish raw guest PII to dashboard snapshots.",
+    "Revenue/ADR/RevPAR are PENDING REST unless sourced from Report Data REST or explicitly labelled MANUAL."
+  ]
+}

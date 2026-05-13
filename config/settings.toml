@@ -1,0 +1,25 @@
+# Working settings for local dev / first cut.
+# On Jack's PC, replace `onedrive_root` with the actual OneDrive-synced path.
+
+[gateway]
+site_label = "Kilmurry Lodge"
+site_id = "KILMURRY"
+poll_interval_hours = 6
+timezone = "UTC"
+mock_mode = true
+log_dir = "./logs"
+log_level = "INFO"
+
+[rezlynx]
+base_url = ""
+site_id = "KILMURRY"
+auth_mode = "mock"
+timeout_seconds = 30
+verify_ssl = true
+
+[publish]
+onedrive_root = "./output"
+feeds_dir = "feeds"
+summaries_dir = "summaries"
+manifests_dir = "manifests"
+write_latest_pointer = true

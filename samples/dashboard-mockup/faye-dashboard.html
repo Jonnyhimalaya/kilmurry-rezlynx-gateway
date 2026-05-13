@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kilmurry Lodge — Revenue Cockpit (Faye)</title>
+<style>
+  /* ---------- Reset & base ---------- */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, #f7f5f1 0%, #efece5 100%);
+    color: #1a1a1a;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ---------- Layout ---------- */
+  .wrap { max-width: 1400px; margin: 0 auto; }
+  .grid { display: grid; gap: 20px; }
+  .grid-3 { grid-template-columns: 2fr 1fr 1fr; }
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 900px) {
+    .grid-3, .grid-2 { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 16px;
+  }
+  .brand h1 {
+    font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+    color: #2d2418;
+  }
+  .brand .subtitle {
+    font-size: 13px; color: #8a7f70; margin-top: 2px;
+    font-weight: 500; letter-spacing: 0.3px;
+  }
+  .trust {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border-radius: 999px; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.3px;
+  }
+  .pill.live    { background: #dcf5e3; color: #14633a; }
+  .pill.stale   { background: #fdf0d3; color: #8a5a05; }
+  .pill.blocked { background: #fce0e0; color: #8a1c1c; }
+  .pill.high    { background: #e0ecff; color: #1b3a8a; }
+  .pill.medium  { background: #fdf0d3; color: #8a5a05; }
+  .pill.low     { background: #fce0e0; color: #8a1c1c; }
+  .pill .dot {
+    width: 7px; height: 7px; border-radius: 999px; background: currentColor;
+  }
+  .meta {
+    font-size: 12px; color: #8a7f70; margin-left: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 1px 1px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .card-title {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: #8a7f70; font-weight: 700; margin-bottom: 12px;
+  }
+
+  /* ---------- KPI hero ---------- */
+  .hero {
+    background: linear-gradient(135deg, #2d2418 0%, #1a1410 100%);
+    color: #f7f5f1; border: none;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50%; right: -10%;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero .card-title { color: #d4af37; }
+  .hero-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    position: relative; z-index: 1;
+  }
+  .kpi-label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: #c4b8a3; font-weight: 600; margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-size: 36px; font-weight: 800; letter-spacing: -1.5px;
+    color: #f7f5f1;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .kpi-delta {
+    font-size: 12px; margin-top: 6px; font-weight: 600;
+  }
+  .delta-up   { color: #6ddc8e; }
+  .delta-down { color: #ff8d8d; }
+  .delta-flat { color: #c4b8a3; }
+
+  /* ---------- Mini KPI strip (secondary) ---------- */
+  .strip {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 0;
+    border-top: 1px solid rgba(247, 245, 241, 0.1);
+    margin-top: 18px; padding-top: 16px; position: relative; z-index: 1;
+  }
+  .strip-cell {
+    text-align: center; padding: 0 6px;
+    border-right: 1px solid rgba(247, 245, 241, 0.06);
+  }
+  .strip-cell:last-child { border-right: none; }
+  .strip-cell .v {
+    font-size: 20px; font-weight: 700; color: #f7f5f1;
+    font-variant-numeric: tabular-nums;
+  }
+  .strip-cell .l {
+    font-size: 10px; text-transform: uppercase; color: #c4b8a3;
+    letter-spacing: 0.8px; margin-top: 2px;
+  }
+
+  /* ---------- Attention box ---------- */
+  .attention {
+    background: #fffdf5; border: 1px solid #f0e1a8;
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .attention .icon {
+    width: 26px; height: 26px; border-radius: 999px;
+    background: #f0c419; color: #2d2418;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .attention .body { font-size: 13px; color: #5a4a30; line-height: 1.5; }
+  .attention .body strong { color: #2d2418; }
+
+  /* ---------- Tables ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; color: #8a7f70; font-weight: 600;
+       font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+       padding: 0 0 8px 0; border-bottom: 1px solid #efece5; }
+  th.num, td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td { padding: 10px 0; border-bottom: 1px solid #f7f5f1; font-weight: 500; }
+  tr:last-child td { border-bottom: none; }
+  .row-bar {
+    position: relative;
+    background: linear-gradient(90deg,
+      rgba(212, 175, 55, var(--bar-strength, 0.0)) var(--bar-pct, 0%),
+      transparent var(--bar-pct, 0%));
+    background-clip: padding-box;
+  }
+  .row-bar td { position: relative; z-index: 1; }
+  .row-bar td:first-child { font-weight: 600; }
+  .channel-icon {
+    display: inline-block; width: 18px; height: 18px; border-radius: 4px;
+    margin-right: 8px; vertical-align: -3px; text-align: center;
+    line-height: 18px; font-size: 10px; font-weight: 700; color: white;
+  }
+  .ch-avvio       { background: #2a8b4f; }
+  .ch-bdc         { background: #003580; }
+  .ch-expedia     { background: #00355f; }
+  .ch-synxis      { background: #5a4a30; }
+  .ch-unmapped    { background: #b0a797; }
+  .ch-hotelbeds   { background: #e74c3c; }
+  .seg-direct    { background: #d4af37; color: #2d2418; }
+  .seg-corporate { background: #2d2418; }
+  .seg-ota       { background: #003580; }
+  .seg-gds       { background: #6b5b40; }
+  .seg-leisure   { background: #8e44ad; }
+  .seg-comp      { background: #95a5a6; }
+
+  /* ---------- Operations grid ---------- */
+  .ops {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+  .ops-cell {
+    background: #faf8f4; border-radius: 10px; padding: 14px;
+    text-align: center; border: 1px solid rgba(0,0,0,0.03);
+  }
+  .ops-cell.alert { background: #fce0e0; border-color: rgba(138, 28, 28, 0.1); }
+  .ops-cell.warn  { background: #fdf0d3; border-color: rgba(138, 90, 5, 0.1); }
+  .ops-cell .v {
+    font-size: 28px; font-weight: 800; color: #2d2418;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .ops-cell .l {
+    font-size: 11px; text-transform: uppercase; color: #8a7f70;
+    letter-spacing: 0.8px; margin-top: 6px; font-weight: 600;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 32px; padding: 20px 0; text-align: center;
+    color: #8a7f70; font-size: 11px; letter-spacing: 0.5px;
+  }
+  footer a { color: #8a7f70; text-decoration: none; border-bottom: 1px dotted #c4b8a3; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>🏨 Kilmurry Lodge — Revenue Cockpit</h1>
+      <div class="subtitle">Wednesday, 4 March 2026 · Faye Fitzgerald</div>
+    </div>
+    <div class="trust">
+      <span class="pill live"><span class="dot"></span> LIVE FEED</span>
+      <span class="pill medium"><span class="dot"></span> CONFIDENCE: MEDIUM</span>
+      <span class="meta">refreshed 4 min ago · next pull 17:00</span>
+    </div>
+  </header>
+
+  <!-- ATTENTION BOX -->
+  <div class="attention">
+    <div class="icon">!</div>
+    <div class="body">
+      <strong>1 data quality flag.</strong> 49 of 96 active bookings have no <em>source</em> field set in the PMS — €4,310 of room revenue is currently unassigned to a channel. The KPI block above is unaffected. Investigating in the PMS later this week may recover full channel attribution.
+    </div>
+  </div>
+
+  <!-- HERO KPI -->
+  <div class="grid grid-3" style="margin-bottom: 20px;">
+
+    <div class="card hero">
+      <div class="card-title">Today's Revenue Performance</div>
+      <div class="hero-grid">
+        <div>
+          <div class="kpi-label">Occupancy</div>
+          <div class="kpi-value">66.2%</div>
+          <div class="kpi-delta delta-up">▲ 4.1pp vs same DOW last year</div>
+        </div>
+        <div>
+          <div class="kpi-label">ADR</div>
+          <div class="kpi-value">€80.67</div>
+          <div class="kpi-delta delta-down">▼ €3.20 vs same DOW last year</div>
+        </div>
+        <div>
+          <div class="kpi-label">RevPAR</div>
+          <div class="kpi-value">€53.41</div>
+          <div class="kpi-delta delta-up">▲ €1.85 vs same DOW last year</div>
+        </div>
+      </div>
+      <div class="strip">
+        <div class="strip-cell"><div class="v">€7,744</div><div class="l">Room Rev</div></div>
+        <div class="strip-cell"><div class="v">96</div><div class="l">Rooms Sold</div></div>
+        <div class="strip-cell"><div class="v">145</div><div class="l">Available</div></div>
+        <div class="strip-cell"><div class="v">34</div><div class="l">Arrivals</div></div>
+        <div class="strip-cell"><div class="v">80</div><div class="l">In-house</div></div>
+        <div class="strip-cell"><div class="v">62</div><div class="l">Stayovers</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Operational Today</div>
+      <div class="ops">
+        <div class="ops-cell"><div class="v">34</div><div class="l">Arrivals</div></div>
+        <div class="ops-cell"><div class="v">75</div><div class="l">Departures</div></div>
+        <div class="ops-cell"><div class="v">62</div><div class="l">Stayovers</div></div>
+        <div class="ops-cell"><div class="v">80</div><div class="l">In-house</div></div>
+        <div class="ops-cell warn"><div class="v">2</div><div class="l">Cancellations</div></div>
+        <div class="ops-cell"><div class="v">0</div><div class="l">No-shows</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Pickup (Phase 2)</div>
+      <div style="text-align: center; padding: 30px 0; color: #b0a797;">
+        <div style="font-size: 38px; margin-bottom: 8px;">⏳</div>
+        <div style="font-size: 13px; font-weight: 600;">Available with Event Archive</div>
+        <div style="font-size: 11px; margin-top: 4px;">Next 24h / 7d / 30d trend</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEGMENT + CHANNEL -->
+  <div class="grid grid-2">
+
+    <div class="card">
+      <div class="card-title">Where the business came from — Market Segment</div>
+      <table>
+        <tr><th>Segment</th><th class="num">Rooms</th><th class="num">Revenue</th><th class="num">Share</th></tr>
+        <tr class="row-bar" style="--bar-pct: 55.2%; --bar-strength: 0.15;">
+          <td><span class="channel-icon seg-direct">D</span>DIRECT</td>
+          <td class="num">53</td><td class="num">€4,582.50</td><td class="num">55.2%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 15.6%; --bar-strength: 0.15;">
+          <td><span class="channel-icon seg-corporate">C</span>CORPORATE</td>
+          <td class="num">15</td><td class="num">€1,020.00</td><td class="num">15.6%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 15.6%; --bar-strength: 0.15;">
+          <td><span class="channel-icon seg-ota">O</span>OTA</td>
+          <td class="num">15</td><td class="num">€1,028.50</td><td class="num">15.6%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 13.5%; --bar-strength: 0.15;">
+          <td><span class="channel-icon seg-gds">G</span>GDS</td>
+          <td class="num">13</td><td class="num">€849.00</td><td class="num">13.5%</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Booking channel mix</div>
+      <table>
+        <tr><th>Channel</th><th class="num">Rooms</th><th class="num">Revenue</th><th class="num">Share</th></tr>
+        <tr class="row-bar" style="--bar-pct: 51.0%; --bar-strength: 0.10;">
+          <td><span class="channel-icon ch-unmapped">?</span>Unmapped <span class="meta" style="margin-left:4px;">(see flag above)</span></td>
+          <td class="num">49</td><td class="num">—</td><td class="num">51.0%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 18.8%; --bar-strength: 0.15;">
+          <td><span class="channel-icon ch-avvio">A</span>Avvio</td>
+          <td class="num">18</td><td class="num">€1,296.50</td><td class="num">18.8%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 13.5%; --bar-strength: 0.15;">
+          <td><span class="channel-icon ch-synxis">S</span>SynXis</td>
+          <td class="num">13</td><td class="num">€849.00</td><td class="num">13.5%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 9.4%; --bar-strength: 0.15;">
+          <td><span class="channel-icon ch-bdc">B</span>Booking.com</td>
+          <td class="num">9</td><td class="num">€665.00</td><td class="num">9.4%</td>
+        </tr>
+        <tr class="row-bar" style="--bar-pct: 7.3%; --bar-strength: 0.15;">
+          <td><span class="channel-icon ch-expedia">E</span>Expedia</td>
+          <td class="num">7</td><td class="num">€623.50</td><td class="num">7.3%</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    Source: Guestline RezLynx via Desktop Gateway · Run gw-4ac0d3b5eee8 · Schema kilmurry.rezlynx.revenue_feed.v1<br>
+    <a href="#">View raw feed JSON</a> · <a href="#">View gateway log</a> · <a href="#">Configure thresholds</a>
+  </footer>
+
+</div>
+</body>
+</html>

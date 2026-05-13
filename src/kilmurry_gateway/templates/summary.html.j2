@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>RezLynx Summary — {{ feed.source_site }} — {{ feed.provenance.target_date }}</title>
+<style>
+  body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+         margin: 24px; color: #1f2937; max-width: 960px; }
+  h1   { font-size: 22px; margin-bottom: 4px; }
+  h2   { font-size: 16px; margin-top: 28px; border-bottom: 1px solid #e5e7eb; padding-bottom: 4px; }
+  .meta { color: #6b7280; font-size: 13px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 12px;
+           font-weight: 600; margin-right: 6px; }
+  .badge.live    { background: #d1fae5; color: #065f46; }
+  .badge.stale   { background: #fef3c7; color: #92400e; }
+  .badge.blocked { background: #fee2e2; color: #991b1b; }
+  .badge.high    { background: #dbeafe; color: #1e40af; }
+  .badge.medium  { background: #fef3c7; color: #92400e; }
+  .badge.low,
+  .badge.blocked-confidence { background: #fee2e2; color: #991b1b; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 12px; }
+  .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; }
+  .card .label { color: #6b7280; font-size: 12px; }
+  .card .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px; }
+  th, td { padding: 6px 8px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+  th     { color: #6b7280; font-weight: 600; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .warn  { background: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px;
+           margin-top: 8px; font-size: 13px; }
+  footer { margin-top: 32px; color: #6b7280; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<h1>{{ feed.source_site }} — RezLynx Revenue Snapshot</h1>
+<div class="meta">
+  Target date: <strong>{{ feed.provenance.target_date }}</strong> ·
+  Generated: {{ feed.generated_at_utc }} ·
+  Source: {{ feed.source_system }}
+</div>
+<div style="margin-top:8px;">
+  <span class="badge {{ feed.freshness.status | lower }}">{{ feed.freshness.status }}</span>
+  <span class="badge {{ feed.confidence | lower }}">CONFIDENCE: {{ feed.confidence | upper }}</span>
+  <span class="meta">age: {{ feed.freshness.age_minutes }} min · poll: every {{ feed.freshness.poll_interval_hours }}h</span>
+</div>
+
+{% if feed.provenance.validation_warnings %}
+<div class="warn">
+  ⚠ {{ feed.provenance.validation_warnings | length }} validation warning(s):
+  <ul>
+  {% for w in feed.provenance.validation_warnings %}
+    <li>{{ w }}</li>
+  {% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<h2>Revenue Snapshot</h2>
+<div class="grid">
+  <div class="card"><div class="label">Occupancy</div><div class="value">{{ "%.1f"|format(feed.kpi.occupancy_pct) }}%</div></div>
+  <div class="card"><div class="label">ADR</div><div class="value">€{{ "%.2f"|format(feed.kpi.adr_eur) }}</div></div>
+  <div class="card"><div class="label">RevPAR</div><div class="value">€{{ "%.2f"|format(feed.kpi.revpar_eur) }}</div></div>
+  <div class="card"><div class="label">Room Revenue</div><div class="value">€{{ "%.2f"|format(feed.kpi.room_revenue_eur) }}</div></div>
+  <div class="card"><div class="label">Rooms Sold</div><div class="value">{{ feed.kpi.rooms_sold }}</div></div>
+  <div class="card"><div class="label">Rooms Available</div><div class="value">{{ feed.kpi.rooms_available }}</div></div>
+</div>
+
+<h2>Today / Operational</h2>
+<div class="grid">
+  <div class="card"><div class="label">Arrivals</div><div class="value">{{ feed.operations.arrivals_today }}</div></div>
+  <div class="card"><div class="label">Departures</div><div class="value">{{ feed.operations.departures_today }}</div></div>
+  <div class="card"><div class="label">Stayovers</div><div class="value">{{ feed.operations.stayovers_today }}</div></div>
+  <div class="card"><div class="label">In-house</div><div class="value">{{ feed.operations.in_house_rooms }}</div></div>
+  <div class="card"><div class="label">Cancellations</div><div class="value">{{ feed.operations.cancellations_today }}</div></div>
+  <div class="card"><div class="label">No-shows</div><div class="value">{{ feed.operations.no_shows_today }}</div></div>
+</div>
+
+<h2>Segment Mix</h2>
+{% if feed['segments']['items'] %}
+<table>
+  <tr><th>Segment</th><th class="num">Rooms</th><th class="num">Revenue</th><th class="num">Share</th></tr>
+  {% for s in feed['segments']['items'] %}
+    <tr>
+      <td>{{ s.name }}</td>
+      <td class="num">{{ s.rooms }}</td>
+      <td class="num">€{{ "%.2f"|format(s.room_revenue_eur) }}</td>
+      <td class="num">{{ "%.1f"|format(s.share_pct) }}%</td>
+    </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="meta">No segment data.</p>
+{% endif %}
+
+<h2>Channel / Source Mix</h2>
+{% if feed['channels']['items'] %}
+<table>
+  <tr><th>Channel</th><th class="num">Rooms</th><th class="num">Revenue</th><th class="num">Share</th></tr>
+  {% for c in feed['channels']['items'] %}
+    <tr>
+      <td>{{ c.name }}</td>
+      <td class="num">{{ c.rooms }}</td>
+      <td class="num">€{{ "%.2f"|format(c.room_revenue_eur) }}</td>
+      <td class="num">{{ "%.1f"|format(c.share_pct) }}%</td>
+    </tr>
+  {% endfor %}
+</table>
+{% else %}
+<p class="meta">No channel data.</p>
+{% endif %}
+
+<h2>Rate / Room Structure</h2>
+<p class="meta">
+  Active rate plans observed: {{ feed.rates.active_rate_plans_count }} ·
+  Room types observed: {{ feed.rates.room_types_count }}
+</p>
+
+<footer>
+  Run ID: {{ feed.provenance.gateway_run_id }} ·
+  Host: {{ feed.provenance.gateway_hostname }} ·
+  Schema: {{ feed.schema }}
+</footer>
+
+</body>
+</html>

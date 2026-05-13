@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.env
+
+# Secrets — never commit
+config/secrets.toml
+secrets.toml
+*.pem
+*.key
+*.crt
+
+# Runtime output
+output/feeds/*.json
+output/summaries/*.html
+output/manifests/*.json
+output-live-test/
+logs/*.log
+logs/*.jsonl
+
+# Local artifacts
+.idea/
+.vscode/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# But keep the directory placeholders + samples
+!output/feeds/.gitkeep
+!output/summaries/.gitkeep
+!output/manifests/.gitkeep
+!logs/.gitkeep
+!samples/**
