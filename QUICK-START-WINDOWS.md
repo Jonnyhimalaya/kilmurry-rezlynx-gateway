@@ -30,7 +30,7 @@ The script will:
 7. Verify the JSON file appeared in OneDrive
 8. Register a Windows Task Scheduler job to run 4x daily
 
-If the OneDrive path on your machine is different from `C:\Users\jack\OneDrive - Kilmurry\Kilmurry Shared AI\Right Revenue Gateway`, **edit the `$OneDriveRoot` line at the top of the script before running**.
+If the OneDrive path on your machine is different from `C:\Users\Claude\OneDrive - kilmurrylodge.com\kilmurry shared AI\Right Revenue Gateway`, **edit the `$OneDriveRoot` line at the top of the script before running**.
 
 ## Secrets file format
 
@@ -58,7 +58,7 @@ cd C:\Tools\kilmurry-gateway
 ```powershell
 cd C:\Tools\kilmurry-gateway
 .\.venv\Scripts\gateway.exe doctor       # config + paths
-Get-ChildItem "C:\Users\jack\OneDrive - Kilmurry\Kilmurry Shared AI\Right Revenue Gateway\feeds" | Sort LastWriteTime -Descending | Select -First 3
+Get-ChildItem "C:\Users\Claude\OneDrive - kilmurrylodge.com\kilmurry shared AI\Right Revenue Gateway\feeds" | Sort LastWriteTime -Descending | Select -First 3
 ```
 
 ## If something goes wrong

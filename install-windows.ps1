@@ -7,7 +7,7 @@ $ErrorActionPreference = 'Stop'
 # --- Config you may want to tweak ---
 $InstallDir   = "C:\Tools\kilmurry-gateway"
 $RepoUrl      = "https://github.com/Jonnyhimalaya/kilmurry-rezlynx-gateway.git"
-$OneDriveRoot = "C:\Users\jack\OneDrive - Kilmurry\Kilmurry Shared AI\Right Revenue Gateway"
+$OneDriveRoot = "C:\Users\Claude\OneDrive - kilmurrylodge.com\kilmurry shared AI\Right Revenue Gateway"
 # ------------------------------------
 
 function Step($msg) { Write-Host "`n>>> $msg" -ForegroundColor Cyan }
